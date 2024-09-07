@@ -12,7 +12,8 @@
     <header class="main-header"></header>
     <div class="content-container">
         <div class="order-card">
-            <p>Выбрано услуг: {{ data.count }}</p>
+            <rect style="width:48px; height: 48px; background-color: blue;"></rect>
+            <a href="{% url 'order' 0 %}">Выбрано услуг: {{ data.count }}</a>
         </div>
         <p class="services-page-title">Услуги издательства</p>
         <div class="search-container">
@@ -22,12 +23,15 @@
         <div class="cards-container">
             {% for service in data.services %}
             <div class="main-service-card">
+                <rect style="height: 170px; width: fill; background-color: blue;">
+
+                </rect>
                 <div class="main-service-info">
                     <p class="main-service-card-title">{{ service.title }}</p>
                     <p class="main-service-card-price">{{ service.price }}</p>
                 </div>
                 <div class="down">
-                    <a href="" class="main-read-more-button">Подробнее</a>
+                    <a href="{% url 'service_url' service.id %}" class="main-read-more-button" role="button">Читать подробнее</a>
                 </div>
             </div>
             {% empty %}

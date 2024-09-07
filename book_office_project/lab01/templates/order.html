@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="margin: 50px 10% 10% 10%;">
+    <p class="services-page-title" style="margin-bottom: 10px;">Заявка №{{data.id}}</p>
+    <div style="width: auto;display: grid; grid-template-columns: 20% auto; grid-template-rows: auto auto; column-gap: 10px; row-gap: 10px;">
+        <p style="font-size: 20px; font-weight: 500;">Формат:</p>
+        <input class="search-input" style="width: auto;" placeholder="{{data.format}}"></input>
+        <p style="width: fit-content; font-size: 20px; font-weight: 500;">Тираж(шт.):</p>
+        <input class="search-input" style="width: auto" placeholder="{{data.circulation}}"></input>
+    </div>
+    {% for service in data.services %}
+    <div style="width: auto; border: 1px solid #000000; border-radius: 20px; padding: 25px 40px; margin-top: 20px;">
+        <div style="display: grid; grid-template-columns: auto auto; gap: 5%;">
+            <rect style="width:auto; height: 100%; background-color: blue"></rect>
+            <div style="display: flex; flex-direction: column;">
+                <p>{{service.title}}</p>
+                <p>{{service.price}}</p>
+                <select>
+                    <option>Тариф "Базовый"</option>
+                    <option>Тариф "Премиум"</option>
+                    <option>Тариф "Профессиональный"</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endblock %}
+</div>
