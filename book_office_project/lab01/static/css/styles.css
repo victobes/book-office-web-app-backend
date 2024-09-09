@@ -1,20 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-*{
+
+* {
     margin: 0;
     /* padding: 0; */
     font-family: 'Montserrat', sans-serif;
 }
-body{
+
+body {
     background: #ffffff;
 }
 
-.main-header{
- border: 1px solid #000000;
- width: 100%;
- height: 60px;
+.main-header {
+    border: 1px solid #000000;
+    width: 100%;
+    height: 50px;
+    padding: 10px 10px 10px 100px;
 }
 
-.content-container{
+.content-container {
     /* width: 80%;
     padding: 10%;
     margin-left: auto;
@@ -27,23 +30,50 @@ body{
     padding-bottom: 5%;
 }
 
-.service-page-content-container{
+.service-page-content-container {
     padding: 100px;
 }
-.service-info-content-container{
+
+.order-page-content-container {
+    margin: 50px 100px 10% 100px;
+}
+
+.order-info-content-container {
+    width: auto;
+    display: grid;
+    grid-template-columns: 20% auto;
+    grid-template-rows: auto auto;
+    column-gap: 10px;
+    row-gap: 10px;
+    align-items: baseline;
+}
+
+.selected-service-info-content-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 12px;
+}
+
+.service-info-content-container {
     display: grid;
     /* grid-template-columns: repeat(2,1fr); */
     grid-template-columns: auto auto;
     gap: 5%;
 }
 
-.cards-container{
+.selected-service-rate-container {
+    border: 1px solid #000000;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.cards-container {
     display: grid;
-    grid-template-columns: repeat(4,1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
 }
 
-.order-card{
+.order-card {
     margin-top: 10px;
     margin-left: 87%;
     border: 1px solid #000000;
@@ -53,10 +83,26 @@ body{
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    /* align-items: center; */
     width: fit-content;
     font-size: 16px;
     font-weight: 500;
+}
+
+.selected-service-card {
+    width: auto;
+    border: 1px solid #000000;
+    border-radius: 20px;
+    padding: 25px 40px;
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 310px auto;
+    gap: 5px;
+}
+
+.order-card-internal {
+    display: grid;
+    justify-content: center
 }
 
 .search-container {
@@ -66,17 +112,17 @@ body{
     margin-bottom: 30px;
 }
 
-.l-service-info{
+.l-service-info {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-.r-service-info{
+.r-service-info {
     display: flex;
 }
 
-.main-service-card{
+.main-service-card {
     border: 1px solid #000000;
     border-radius: 20px;
     padding: 18px;
@@ -84,76 +130,121 @@ body{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 10px;
 }
 
-/* .main-service-info{
-
-} */
-
 /* Текстовые поля */
-.services-page-title{
+.services-page-title {
     text-align: center;
     font-size: 48px;
     font-weight: bold;
-    color: #000000; 
+    color: #000000;
 }
 
-.main-service-card-title{
+.main-service-card-title {
     /* margin-top: 16px; */
     font-size: 20px;
     font-weight: bold;
-    color: #000000; 
+    color: #000000;
 }
-.main-service-card-price{
+
+.main-service-card-price {
     font-size: 16px;
     font-weight: 500;
     width: 100%;
     margin-top: 10px;
     margin-bottom: 10px;
-    color: #000000; 
+    color: #000000;
 }
 
-.service-page-title{
+.service-page-title {
     text-align: left;
     font-size: 48px;
     font-weight: bold;
     margin-bottom: 20px;
-    color: #000000; 
+    color: #000000;
 }
 
-.service-page-price{
+.order-page-title {
+    text-align: center;
+    font-size: 48px;
+    font-weight: bold;
+    color: #000000;
+    margin-bottom: 10px;
+}
+
+.order-info-field-title {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.service-page-price {
     font-size: 32px;
     font-weight: bold;
-    color: #000000; 
+    color: #000000;
 }
 
-.service-page-description{
+.service-page-description {
     font-size: 32px;
     font-weight: 300;
-    white-space: pre-line; 
-    color: #000000; 
+    white-space: pre-line;
+    color: #000000;
+}
+
+.selected-service-title {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.selected-service-price {
+    font-size: 24px;
+    font-weight: 500;
+}
+
+.selected-service-rate {
+    font-size: 20px;
 }
 
 /* Ссылки */
-.main-read-more-button{
+.main-read-more-button {
     width: 100%;
     border-radius: 5px;
     border: 1px solid #000000;
     background-color: #000000;
     font-size: 16px;
     font-weight: 700;
-    color:#ffffff;
+    color: #ffffff;
     text-decoration: none;
     text-align: center;
     vertical-align: middle;
     padding-top: 10px;
-    padding-bottom: 10px;   
+    padding-bottom: 10px;
+}
+
+.main-read-more-button:hover{
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #848DC7;
+    background-color: #848DC7;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    text-decoration: none;
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.order-card-ref {
+    text-decoration: none;
+    color: #000000
 }
 
 /* Кнопки */
-.search-button{
+.search-button {
     width: 84px;
-    height: 45px;
+    height: 49px;
     background-color: #ffffff;
     border: 1px solid #000000;
     border-radius: 10px;
@@ -161,7 +252,18 @@ body{
     font-weight: 500;
 }
 
-.search-input{
+.search-button:hover {
+    width: 84px;
+    height: 49px;
+    background-color: #848DC7;
+    border: 1px solid #000000;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Поля ввода */
+.search-input {
     width: 437px;
     height: 45px;
     border: 1px solid #000000;
@@ -171,8 +273,30 @@ body{
     padding-left: 10px;
 }
 
-.down{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.order-info-input {
+    width: auto;
+    font-size: 22px;
+    font-weight: 500;
+    padding: 8px 10px;
+    border: 1px solid #000000;
+    border-radius: 10px;
+}
+
+/* Картинки */
+.main-service-card-img {
+    height: 170px;
+    width: fill;
+    border-radius: 10px;
+}
+
+.service-info-img {
+    height: 270px;
+    width: 511px;
+    border-radius: 10px;
+}
+
+.selected-service-img {
+    width: 300px;
+    height: 146px;
+    border-radius: 10px;
 }

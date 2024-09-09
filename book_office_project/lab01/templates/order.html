@@ -1,27 +1,31 @@
 {% extends 'base.html' %}
 
+{% block title %}Заявка{% endblock %}
+
 {% block content %}
-<div style="margin: 50px 10% 10% 10%;">
-    <p class="services-page-title" style="margin-bottom: 10px;">Заявка №{{data.id}}</p>
-    <div style="width: auto;display: grid; grid-template-columns: 20% auto; grid-template-rows: auto auto; column-gap: 10px; row-gap: 10px;">
-        <p style="font-size: 20px; font-weight: 500;">Формат:</p>
-        <input class="search-input" style="width: auto;" placeholder="{{data.format}}"></input>
-        <p style="width: fit-content; font-size: 20px; font-weight: 500;">Тираж(шт.):</p>
-        <input class="search-input" style="width: auto" placeholder="{{data.circulation}}"></input>
+<div class="order-page-content-container">
+    <p class="order-page-title">Заявка №{{data.id}}</p>
+    <div class="order-info-content-container">
+        <p class="order-info-field-title">Формат:</p>
+        <div class="order-info-input">{{data.format}}</div>
+        <p class="order-info-field-title">Тираж (шт.):</p>
+        <div class="order-info-input">{{data.circulation}}</div>
     </div>
+
     {% for service in data.services %}
-    <div style="width: auto; border: 1px solid #000000; border-radius: 20px; padding: 25px 40px; margin-top: 20px;">
-        <div style="display: grid; grid-template-columns: auto auto; gap: 5%;">
-            <rect style="width:auto; height: 100%; background-color: blue"></rect>
-            <div style="display: flex; flex-direction: column;">
-                <p>{{service.title}}</p>
-                <p>{{service.price}}</p>
-                <select>
+    <div class="selected-service-card">
+        <img src="{{ service.service_img_src }}" alt="{{service.title}}" class="selected-service-img"></img>
+        <div class="selected-service-info-content-container">
+            <p class="selected-service-title">{{ service.title }}</p>
+            <p class="selected-service-price">{{ service.price }}</p>
+            <div class="selected-service-rate-container">
+                <p class="selected-service-rate">{{ service.rate }}</p>
+            </div>
+            <!-- <select style="font-size: 16px; font-weight: 500; padding: 5px 11px;">
                     <option>Тариф "Базовый"</option>
                     <option>Тариф "Премиум"</option>
                     <option>Тариф "Профессиональный"</option>
-                </select>
-            </div>
+                </select> -->
         </div>
     </div>
     {% endfor %}
