@@ -98,7 +98,7 @@ def get_book_production_services_list(search_query: str):
 
 
 def get_book_production_services_list_page(request):
-    search_query = request.GET.get("search_book_production_service_by_name_query", "")
+    search_query = request.GET.get("book_production_service_name", "")
     current_project_id = 1
 
     return render(

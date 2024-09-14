@@ -234,8 +234,8 @@ body {
 .main-read-more-button:hover {
     width: 100%;
     border-radius: 5px;
-    border: 1px solid #848DC7;
-    background-color: #848DC7;
+    border: 1px solid #858dc7;
+    background-color: #858dc7;
     font-size: 16px;
     font-weight: 700;
     color: #ffffff;
@@ -272,7 +272,7 @@ body {
 .search-button:hover {
     width: 84px;
     height: 49px;
-    background-color: #848DC7;
+    background-color: #858dc7;
     border: 1px solid #000000;
     border-radius: 10px;
     font-size: 16px;
