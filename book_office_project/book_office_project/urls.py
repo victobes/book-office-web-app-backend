@@ -21,7 +21,7 @@ from lab01 import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.get_services_list_page, name='services'),
-    path('service/<int:id>/', views.get_service_page, name='service_url'),
-    path('order/<int:id>/', views.get_order_page, name='order'),
+    path('', views.get_book_production_services_list_page, name='services'),
+    path('service/<int:id>/', views.get_book_production_service_page, name='service_url'),
+    path('project/<int:id>/', views.get_book_publishing_project_page, name='project'),
 ]

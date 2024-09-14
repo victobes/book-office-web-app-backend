@@ -73,6 +73,16 @@ body {
     gap: 20px;
 }
 
+.header-home-link-container {
+    display: flex;
+    vertical-align: middle;
+    gap: 10px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+
 .order-card {
     margin-top: 10px;
     margin-left: 87%;
@@ -221,7 +231,7 @@ body {
     padding-bottom: 10px;
 }
 
-.main-read-more-button:hover{
+.main-read-more-button:hover {
     width: 100%;
     border-radius: 5px;
     border: 1px solid #848DC7;
@@ -238,6 +248,13 @@ body {
 
 .order-card-ref {
     text-decoration: none;
+    color: #000000
+}
+
+.home-link {
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
     color: #000000
 }
 
