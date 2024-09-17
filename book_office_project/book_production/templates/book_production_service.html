@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ data.service.title }}{% endblock %}
+
+{% block content %}
+<div class="service-page-content-container">
+    <p class="service-page-title">{{ data.service.title }} </p>
+    <div class="service-info-content-container">
+        <div class="l-service-info">
+            <p class="service-page-price">{{ data.price }}</p>
+            <img src="{{ data.service.image_url }}" alt="{{ data.service.title }}" class="service-info-img"></img>
+        </div>
+        <div class="r-service-info">
+            <p class="service-page-description">{{ data.service.description }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
