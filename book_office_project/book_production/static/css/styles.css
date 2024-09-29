@@ -12,7 +12,7 @@ body {
 
 .main-header {
     border: 1px solid #000000;
-    width: 100%;
+    width: auto;
     height: 50px;
     padding: 10px 10px 10px 100px;
 }
@@ -99,10 +99,26 @@ body {
     font-weight: 500;
 }
 
+.inactive-order-card {
+    margin-top: 10px;
+    margin-left: 87%;
+    border: 1px solid #858dc7;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* align-items: center; */
+    width: fit-content;
+    font-size: 16px;
+    font-weight: 500;
+}
+
 .selected-service-card {
     width: auto;
     border: 1px solid #000000;
-    border-radius: 20px;
+    border-radius: 10px;
     padding: 25px 40px;
     margin-top: 20px;
     display: grid;
@@ -232,23 +248,20 @@ body {
 }
 
 .main-read-more-button:hover {
-    width: 100%;
-    border-radius: 5px;
     border: 1px solid #858dc7;
     background-color: #858dc7;
-    font-size: 16px;
-    font-weight: 700;
-    color: #ffffff;
-    text-decoration: none;
-    text-align: center;
-    vertical-align: middle;
-    padding-top: 10px;
-    padding-bottom: 10px;
 }
 
 .order-card-ref {
     text-decoration: none;
     color: #000000
+}
+
+.inactive-order-card-ref {
+    text-decoration: none;
+    color: #858dc7;
+    pointer-events: none;
+    cursor: default;
 }
 
 .home-link {
@@ -270,13 +283,26 @@ body {
 }
 
 .search-button:hover {
-    width: 84px;
-    height: 49px;
     background-color: #858dc7;
+}
+
+.select-service-button {
+    width: 100%;
+    border-radius: 5px;
     border: 1px solid #000000;
-    border-radius: 10px;
+    background-color: #ffffff;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 700;
+    color: #000000;
+    text-decoration: none;
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.select-service-button:hover {
+    background-color: #858dc7;
 }
 
 /* Поля ввода */
@@ -296,7 +322,7 @@ body {
     font-weight: 500;
     padding: 8px 10px;
     border: 1px solid #000000;
-    border-radius: 10px;
+    border-radius: 2px;
 }
 
 /* Картинки */
@@ -316,4 +342,31 @@ body {
     width: 300px;
     height: 146px;
     border-radius: 10px;
+}
+
+.text-margins {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.rate-select {
+    width: 100%;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 5px 11px;
+}
+
+.format-select {
+    width: 100%;
+    font-size: 22px;
+    font-weight: 500;
+    padding: 5px 11px;
+}
+
+.project-buttons-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
 }

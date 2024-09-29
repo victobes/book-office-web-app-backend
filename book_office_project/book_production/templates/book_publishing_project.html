@@ -3,31 +3,45 @@
 {% block title %}Заявка{% endblock %}
 
 {% block content %}
-<div class="order-page-content-container">
-    <p class="order-page-title">Заявка №{{data.id}}</p>
-    <div class="order-info-content-container">
-        <p class="order-info-field-title">Формат:</p>
-        <div class="order-info-input">{{data.format}}</div>
-        <p class="order-info-field-title">Тираж (шт.):</p>
-        <div class="order-info-input">{{data.circulation}}</div>
-    </div>
+<form method="post" action="{% url 'delete_book_publishing_project' data.id %}">
+    {% csrf_token %}
+    <div class="order-page-content-container">
+        <p class="order-page-title">Проект №{{data.project_id}}</p>
+        <div class="order-info-content-container">
+            <p class="order-info-field-title">Формат:</p>
+            <select class="format-select" name="format_info" value="{{ data.format }}">
+                <option value="A4" selected>A4</option>
+                <option value="A5">A5</option>
+                <option value="A6">A6</option>
+                <option value="B5">B5</option>
+                <option value="SQUARE">Квадрат</option>
+            </select>
+            <p class="order-info-field-title">Тираж (шт.):</p>
+            <input class="order-info-input" type="number" name="circulation_info" value="{{ data.circulation }}">
+        </div>
 
-    {% for service in data.services %}
-    <div class="selected-service-card">
-        <img src="{{ service.service_img_src }}" alt="{{service.title}}" class="selected-service-img"></img>
-        <div class="selected-service-info-content-container">
-            <p class="selected-service-title">{{ service.title }}</p>
-            <p class="selected-service-price">{{ service.price }}</p>
-            <div class="selected-service-rate-container">
-                <p class="selected-service-rate">{{ service.rate }}</p>
+        {% for pos in data.selected_services_list %}
+        <div class="selected-service-card">
+            <img src="{{ pos.service.image_url }}" alt="{{ pos.service.title }}" class="selected-service-img"></img>
+            <div class="selected-service-info-content-container">
+                <p class="selected-service-title">{{ pos.service.title }}</p>
+                <p class="selected-service-price">{{ pos.service.price }}</p>
+                <select class="rate-select" name="{{ data.project_id }}-{{ pos.service_id }}" value="{{ pos.rate }}">
+                    <option value="BASE" selected>Тариф "Базовый"</option>
+                    <option value="PREMIUM">Тариф "Премиум"</option>
+                    <option value="PROFESSIONAL">Тариф "Профессиональный"</option>
+                </select>
             </div>
-            <!-- <select style="font-size: 16px; font-weight: 500; padding: 5px 11px;">
-                    <option>Тариф "Базовый"</option>
-                    <option>Тариф "Премиум"</option>
-                    <option>Тариф "Профессиональный"</option>
-                </select> -->
+        </div>
+        {% empty %}
+        <div>Проект пуст</div>
+        {% endfor %}
+        <div class="project-buttons-container">
+            {% if data.selected_services_list %}
+            <button class="btn select-service-button" name="request_action" value="delete_project">Удалить
+                проект</button>
+            {% endif %}
         </div>
     </div>
-    {% endfor %}
-    {% endblock %}
-</div>
+</form>
+{% endblock %}

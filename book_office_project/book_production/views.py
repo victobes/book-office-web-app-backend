@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.shortcuts import render, redirect
 from django.db import connection
+from django.db.models import Q
 
 from book_production.models import (
     BookProductionService,
@@ -9,130 +10,74 @@ from book_production.models import (
     SelectedServices,
 )
 
-MINIO_HOST = "localhost"
-MINIO_PORT = 9000
-MINIO_DIR = "book-office-services-images"
-EXTENSION = ".jpg"
-
-book_production_services = [
-    {
-        "id": 1,
-        "title": "Корректура текста",
-        "service_img_src": f"http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/1{EXTENSION}",
-        "price": "от 45 руб. за 1000 символов",
-        "description": "Корректура текста (корректорская правка) - это исправление орфографических, грамматических и пунктуационных ошибок в тексте, устранение морфологических ошибок (употребления форм склонения, числа, падежа и т.д.), проверку соблюдения правил переноса.",
-    },
-    {
-        "id": 2,
-        "title": "Дизайн обложки",
-        "service_img_src": f"http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/2{EXTENSION}",
-        "price": "от 3500 руб.",
-        "description": "Разрабатываем дизайн обложки для книги любого жанра.\nСложность: от простой шрифтовой композиции до сложной иллюстрированной.\nТехнические требования: для книг в разных переплетах.\nВыбор: всегда предоставляем три варианта дизайна на выбор заказчику.\nИспользуем лицензионные шрифты и картинки, учитываем пожелания.",
-    },
-    {
-        "id": 3,
-        "title": "Вёрстка книги",
-        "service_img_src": f"http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/3{EXTENSION}",
-        "price": "от 65 руб. за 1 страницу",
-        "description": "Верстаем книги любой сложности и любого формата.\nМакеты: полиграфический и электронный.\nСложность: от художественной литературы до научной с формулами.\nДизайн: от незамысловатого до макета с разработанной дизайн-концепцией.\nСоблюдаем технические требования типографии, СанПины и ГОСТы.",
-    },
-    {
-        "id": 4,
-        "title": "Иллюстрирование",
-        "service_img_src": f"http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/4{EXTENSION}",
-        "price": "от 1200 руб.",
-        "description": "Работаем с иллюстративным материалом для книги.\nОтрисовка: создаем иллюстрации с нуля по вашему техническому заданию или составляем ТЗ. В разных стилях и техниках.\nПодбор: подбираем иллюстрации из лицензионных стоков под вашу тематику в едином стиле.",
-    },
-]
-
-book_publishing_projects = [
-    {
-        "id": 1,
-        "format": "A4",
-        "circulation": 500,
-        "selected_services": [
-            {
-                "id": 2,
-                "title": "Дизайн обложки",
-                "price": "от 3500 руб.",
-                "service_img_src": f"http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/2{EXTENSION}",
-                "rate": 'Тариф "Базовый"',
-            },
-            {
-                "id": 3,
-                "title": "Вёрстка книги",
-                "price": "от 65 руб. за 1 страницу",
-                "service_img_src": f"http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/3{EXTENSION}",
-                "rate": 'Тариф "Премиум"',
-            },
-        ],
-    },
-    {
-        "id": 2,
-        "format": "A5",
-        "circulation": 10000,
-        "selected_services": [
-            {
-                "id": 3,
-                "title": "Вёрстка книги",
-                "price": "от 65 руб. за 1 страницу",
-                "service_img_src": f"http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/3{EXTENSION}",
-                "rate": 'Тариф "Базовый"',
-            },
-            {
-                "id": 4,
-                "title": "Иллюстрирование",
-                "price": "от 1200 руб.",
-                "service_img_src": f"http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/4{EXTENSION}",
-                "rate": 'Тариф "Премиум"',
-            },
-            {
-                "id": 1,
-                "title": "Корректура текста",
-                "price": "от 45 руб. за 1000 символов",
-                "service_img_src": f"http://{MINIO_HOST}:{MINIO_PORT}/{MINIO_DIR}/1{EXTENSION}",
-                "rate": 'Тариф "Базовый"',
-            },
-        ],
-    },
-]
+CUSTOMER_ID = 1
 
 
-def get_book_production_services_list(search_query: str):
-    result = []
-    for service in book_production_services:
-        if service["title"].lower().startswith(search_query.lower()):
-            result.append(service)
-    return result
+def get_publishing_project_data(project_id: int):
+    """Формирует и возвращает данные проекта"""
+    project = BookPublishingProject.objects.filter(
+        ~Q(status=BookPublishingProject.ProjectStatus.DELETED), id=project_id
+    ).first()
+
+    if project is None:
+        return {
+            "id": project_id,
+            "project_id": project_id,
+            "circulation": 100,
+            "format": BookPublishingProject.BookFormat.A_4,
+            "selected_services_list": [],
+        }
+
+    selected_services = SelectedServices.objects.filter(
+        project_id=project_id
+    ).select_related("service")
+    return {
+        "id": project_id,
+        "project_id": project_id,
+        "circulation": project.circulation,
+        "format": project.format,
+        "selected_services_list": selected_services,
+    }
+
 
 def get_selected_services_count(project_id: int) -> int:
-    return SelectedServices.objects.filter(project_id=project_id).select_related('service').count()
+    """Возвращает количество выбранных услуг в проекте по его id"""
+    return (
+        SelectedServices.objects.filter(project_id=project_id)
+        .select_related("service")
+        .count()
+    )
+
 
 def get_book_production_services_list_page(request):
+    """Возвращает страницу со списком услуг книжного издательства"""
     service_name = request.GET.get("book_production_service_name", "")
-    current_project_id = 1
-
-    book_production_services_list = BookProductionService.objects.filter(title__istartswith=service_name, is_active=True)
+    project = BookPublishingProject.objects.filter(
+        customer_id=CUSTOMER_ID, status=BookPublishingProject.ProjectStatus.DRAFT
+    ).first()
+    book_production_services_list = BookProductionService.objects.filter(
+        title__istartswith=service_name, is_active=True
+    )
     return render(
         request,
         "book_production_services_list.html",
         {
             "data": {
-                # "services": get_book_production_services_list(search_query),
                 "services": book_production_services_list,
-                # "count": len(
-                #     book_publishing_projects[current_project_id - 1][
-                #         "selected_services"
-                #     ]
-                # ),
-                "count": get_selected_services_count(current_project_id),
-                "project_id": current_project_id,
-                "search_query": service_name,
+                "selected_services_count": (
+                    get_selected_services_count(project.id)
+                    if project is not None
+                    else 0
+                ),
+                "project_id": (project.id if project is not None else 0),
+                "service_name": service_name,
             },
         },
     )
 
+
 def get_book_production_service_page(request, id):
+    """Возвращает страницу услуги книжного издательства"""
     data = BookProductionService.objects.filter(id=id).first()
     if data is None:
         return render(request, "book_production_service.html")
@@ -147,42 +92,71 @@ def get_book_production_service_page(request, id):
     )
 
 
-def get_book_publishing_project_page(request, id):
-    current_project_id = 1
-    for project in book_publishing_projects:
-        if project["id"] == current_project_id:
-            return render(
-                request,
-                "book_publishing_project.html",
-                {
-                    "data": {
-                        "id": current_project_id,
-                        "format": project["format"],
-                        "circulation": project["circulation"],
-                        "services": project["selected_services"],
-                    },
-                },
-            )
+def get_book_publishing_project_page(request, id: int):
+    """Возвращает страницу проекта"""
+    if BookPublishingProject.objects.filter(id=id, status=BookPublishingProject.ProjectStatus.DELETED).first() is not None:
+        return redirect("services")
+        
+    return render(
+        request,
+        "book_publishing_project.html",
+        {"data": get_publishing_project_data(id)},
+    )
 
-# def get_book_production_service_page(request, id):
-#     for service in book_production_services:
-#         if service["id"] == id:
-#             return render(request, "book_production_service.html", {"data": service})
-#     render(request, "book_production_service.html")
 
-# def get_book_production_services_list_page(request):
-#     search_query = request.GET.get("book_production_service_name", "")
-#     current_project_id = 1
+def add_service_to_project_request(project_id: int, service_id: int):
+    """Добавляет услугу в проект"""
+    selected_service = SelectedServices(project_id=project_id, service_id=service_id)
+    selected_service.save()
 
-#     return render(
-#         request,
-#         "book_production_services.html",
-#         {
-#             "data": {
-#                 "services": get_book_production_services_list(search_query),
-#                 "count": len(book_publishing_projects[current_project_id - 1]["selected_services"]),
-#                 "project_id": current_project_id,
-#                 "search_query": search_query,
-#             },
-#         },
-#     )
+
+def add_book_production_service_to_project(request):
+    """Обрабатывает добавление услуги в проект"""
+    if request.method != "POST":
+        return redirect("services")
+    data = request.POST
+    service_id = data.get("add_to_project")
+    if service_id is not None:
+        project_id = get_or_create_customer_project(CUSTOMER_ID)
+        add_service_to_project_request(project_id, service_id)
+    return get_book_production_services_list_page(request)
+
+
+def get_or_create_customer_project(customer_id: int) -> int:
+    """
+    Если у пользователя есть проект в статусе DRAFT, то возвращает его id.
+    Если нет, то создает проект и возвращает его id.
+    """
+    draft_project = BookPublishingProject.objects.filter(
+        customer_id=CUSTOMER_ID, status=BookPublishingProject.ProjectStatus.DRAFT
+    ).first()
+    if draft_project is not None:
+        return draft_project.id
+
+    new_draft_project = BookPublishingProject(
+        customer_id=CUSTOMER_ID,
+        status=BookPublishingProject.ProjectStatus.DRAFT,
+        circulation=100,
+    )
+    new_draft_project.save()
+    return new_draft_project.id
+
+
+def delete_project(project_id: int):
+    """Удаляет проект по его id"""
+    raw_query = "UPDATE book_publishing_projects SET status='DELETED' WHERE id=%s"
+    with connection.cursor() as cursor:
+        cursor.execute(raw_query, (project_id,))
+
+
+def delete_book_publishing_project(request, id: int):
+    """Обрабатывает удаление проекта"""
+    if request.method != "POST":
+        return redirect("project")
+
+    data = request.POST
+    action = data.get("request_action")
+    if action == "delete_project":
+        delete_project(id)
+        return redirect("services")
+    return get_book_publishing_project_page(request, id)
