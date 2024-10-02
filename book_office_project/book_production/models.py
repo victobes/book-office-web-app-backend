@@ -44,9 +44,10 @@ class BookPublishingProject(models.Model):
     format = models.CharField(
         max_length=10,
         choices=BookFormat.choices,
+        default=BookFormat.A_4,
     )
     
-    circulation = models.IntegerField()
+    circulation = models.IntegerField(blank=True, null=True)
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_requests')
     manager = models.ForeignKey(User, on_delete=models.CASCADE, related_name='managed_requests', blank=True, null=True)
     personal_discount = models.IntegerField(blank=True, null=True)

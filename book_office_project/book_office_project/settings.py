@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-dv7kl=i+2hbrj-n(^3y!p5919nvj@^92+lakpe7)7rlz==-yco
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    'rest_framework',
+    'rest_framework.authtoken',
 
     'book_production'
 ]
@@ -56,7 +59,8 @@ ROOT_URLCONF = 'book_office_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ BASE_DIR / "book_production/templates" ],
+        # 'DIRS': [ BASE_DIR / "book_production/templates" ],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,8 +81,8 @@ WSGI_APPLICATION = 'book_office_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
@@ -130,3 +134,9 @@ STATICFILES_DIRS = []
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MINIO_ENDPOINT_URL = '127.0.0.1:9000'
+MINIO_ACCESS_KEY = 'minio'
+MINIO_SECRET_KEY = 'minio124'
+MINIO_SECURE = False
+MINIO_BUCKET_NAME = 'book-office-services-images'
