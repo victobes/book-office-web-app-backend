@@ -139,16 +139,34 @@ class ServiceForProjectSerializer(serializers.ModelSerializer):
 
 
 class RelatedSerializer(serializers.ModelSerializer):
-    service = ServiceForProjectSerializer()
-
+    service = serializers.SerializerMethodField()
+    
+    def get_service(self, obj):
+        return {
+            "pk": obj.service.id,
+            "title": obj.service.title,
+            "price": obj.service.price,
+            "image_url": obj.service.image_url,
+        }
+        
     class Meta:
         model = SelectedServices
-        fields = ["pk", "service", "rate"]
+        fields = ["service", "rate"]
 
 
 class FullBookPublishingProjectSerializer(serializers.ModelSerializer):
-    services_list = RelatedSerializer(source="selectedservices_set", many=True)
-
+    services_list = serializers.SerializerMethodField()
+    
+    def get_services_list(self, obj):
+        services_list = RelatedSerializer(obj.selectedservices_set, many=True).data
+        rate_list = [service['rate'] for service in services_list]
+        
+        services_list = [service['service'] for service in services_list]
+        for i,service in enumerate(services_list):
+            service['rate'] = rate_list[i]
+            
+        return services_list
+    
     class Meta:
         model = BookPublishingProject
         fields = [
