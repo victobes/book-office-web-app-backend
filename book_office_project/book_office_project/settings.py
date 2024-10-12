@@ -140,3 +140,6 @@ MINIO_ACCESS_KEY = 'minio'
 MINIO_SECRET_KEY = 'minio124'
 MINIO_SECURE = False
 MINIO_BUCKET_NAME = 'book-office-services-images'
+
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379

@@ -1,4 +1,5 @@
 import os
+import redis
 
 from datetime import datetime
 from dateutil.parser import parse
@@ -22,9 +23,10 @@ from book_production.serializers import *
 SINGLETON_USER = User(id=1, username="admin")
 SINGLETON_MANAGER = User(id=2, username="manager")
 
+session_storage = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
+
+
 # BookProductionService
-
-
 @api_view(["GET"])
 def get_book_production_services_list(request):
     """
