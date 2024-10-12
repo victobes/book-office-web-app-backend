@@ -7,16 +7,45 @@ from book_production.models import (
     SelectedServices,
 )
 
+# User
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "password"]
+        extra_kwargs = {"password": {"write_only": True}}
 
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data["username"],
+            password=validated_data["password"],
+            email=validated_data.get("email", ""),
+        )
+        return user
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get("email", instance.email)
+        if "password" in validated_data:
+            instance.set_password(validated_data["password"])
+        instance.save()
+        return instance
+    
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username"]
+        
+        
 # BookProductionService
 class BookProductionServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookProductionService
         fields = ["pk", "title", "description", "is_active", "image_url", "price"]
-
-
+ 
+        
 # BookPublishingProject
 class BookPublishingProjectSerializer(serializers.ModelSerializer):
+    customer = CustomerSerializer()
+    
     class Meta:
         model = BookPublishingProject
         fields = [
@@ -27,9 +56,9 @@ class BookPublishingProjectSerializer(serializers.ModelSerializer):
             "completion_datetime",
             "format",
             "circulation",
-            "customer",
             "manager",
             "personal_discount",
+            "customer"
         ]
 
 
@@ -100,13 +129,13 @@ class ResolveBookPublishingProjectSerializer(serializers.ModelSerializer):
 class SelectedServicesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SelectedServices
-        fields = ["pk", "project", "service", "rate"]
+        fields = ["project", "service", "rate"]
 
 
 class ServiceForProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookProductionService
-        fields = ["pk", "title", "price", "image_url"]
+        fields = ["title", "price", "image_url"]
 
 
 class RelatedSerializer(serializers.ModelSerializer):
@@ -136,25 +165,3 @@ class FullBookPublishingProjectSerializer(serializers.ModelSerializer):
             "services_list",
         ]
 
-
-# User
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["id", "username", "email", "password"]
-        extra_kwargs = {"password": {"write_only": True}}
-
-    def create(self, validated_data):
-        user = User.objects.create_user(
-            username=validated_data["username"],
-            password=validated_data["password"],
-            email=validated_data.get("email", ""),
-        )
-        return user
-
-    def update(self, instance, validated_data):
-        instance.email = validated_data.get("email", instance.email)
-        if "password" in validated_data:
-            instance.set_password(validated_data["password"])
-        instance.save()
-        return instance

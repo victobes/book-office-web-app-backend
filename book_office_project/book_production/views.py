@@ -205,7 +205,7 @@ def get_book_publishing_projects(request):
     if formation_datetime_end_filter is not None:
         filters &= Q(formation_datetime__lte=parse(formation_datetime_end_filter))
 
-    projects = BookPublishingProject.objects.filter(filters)
+    projects = BookPublishingProject.objects.filter(filters).select_related("customer")
     serializer = BookPublishingProjectSerializer(projects, many=True)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -310,11 +310,11 @@ def delete_book_publishing_project(request, pk):
 # SelectedServices
 
 @api_view(['PUT'])
-def put_selected_service(request, pk):
+def put_selected_service(request, project_pk, service_pk):
     """
     Изменение данных о выбранной услуге в проекте
     """
-    selected_service = SelectedServices.objects.filter(id=pk).first()
+    selected_service = SelectedServices.objects.filter(project_id=project_pk, service_id=service_pk).first()
     if selected_service is None:
         return Response("Selected service not found", status=status.HTTP_404_NOT_FOUND)
     serializer = SelectedServicesSerializer(selected_service, data=request.data, partial=True)
@@ -325,11 +325,11 @@ def put_selected_service(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
-def delete_selected_service(request, pk):
+def delete_selected_service(request, project_pk, service_pk):
     """
     Удаление выбранной услуги из проекта
     """
-    selected_service = SelectedServices.objects.filter(id=pk).first()
+    selected_service = SelectedServices.objects.filter(project_id=project_pk, service_id=service_pk).first()
     if selected_service is None:
         return Response("Selected service not found", status=status.HTTP_404_NOT_FOUND)
     selected_service.delete()

@@ -91,12 +91,12 @@ urlpatterns = [
     ),
     # SelectedServices
     path(
-        "selected_services/<int:pk>/put",
+        "selected_services/<int:project_pk>/<int:service_pk>/put",
         views.put_selected_service,
         name="selected_service_put",
     ),
     path(
-        "selected_services/<int:pk>/delete",
+        "selected_services/<int:project_pk>/<int:service_pk>/delete",
         views.delete_selected_service,
         name="selected_service_delete",
     ),
@@ -107,11 +107,3 @@ urlpatterns = [
     path("users/update", views.update_user, name="users_update"),
 ]
 
-# urlpatterns = [
-#     path('admin/', admin.site.urls),
-#     path('', views.get_book_production_services_list_page, name='services'),
-#     path('book_production_service/<int:id>/', views.get_book_production_service_page, name='service_url'),
-#     path('book_publishing_project/<int:id>/', views.get_book_publishing_project_page, name='project'),
-#     path('add_service_to_project/', views.add_book_production_service_to_project, name='add_service_to_project'),
-#     path('delete_book_publishing_project/<int:id>/', views.delete_book_publishing_project, name='delete_book_publishing_project'),
-# ]
