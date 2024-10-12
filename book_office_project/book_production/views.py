@@ -15,6 +15,8 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from book_office_project import settings
 from book_production.minio import MinioStorage
@@ -27,6 +29,22 @@ session_storage = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDI
 
 
 # BookProductionService
+@swagger_auto_schema(
+    method="get",
+    responses={
+        status.HTTP_200_OK: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "book_production_services": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(type=openapi.TYPE_OBJECT),
+                ),
+                "book_publishin_project_id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                "selected_services_count": openapi.Schema(type=openapi.TYPE_NUMBER),
+            },
+        ),
+    },
+)
 @api_view(["GET"])
 def get_book_production_services_list(request):
     """
@@ -50,7 +68,7 @@ def get_book_production_services_list(request):
 
     return Response(
         {
-            "services": serializer.data,
+            "book_production_services": serializer.data,
             "project_id": project_id,
             "selected_services_count": selected_services_count,
         },
@@ -67,6 +85,14 @@ def get_selected_services_count(project_id: int) -> int:
     )
 
 
+@swagger_auto_schema(
+    method="post",
+    request_body=BookProductionServiceSerializer,
+    responses={
+        status.HTTP_200_OK: BookProductionServiceSerializer(),
+        status.HTTP_400_BAD_REQUEST: "Bad Request",
+    },
+)
 @api_view(["POST"])
 def post_book_production_service(request):
     """
@@ -81,6 +107,22 @@ def post_book_production_service(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+    method="post",
+    manual_parameters=[
+        openapi.Parameter(
+            name="image",
+            in_=openapi.IN_QUERY,
+            type=openapi.TYPE_FILE,
+            required=True,
+            description="Image",
+        )
+    ],
+    responses={
+        status.HTTP_200_OK: "OK",
+        status.HTTP_400_BAD_REQUEST: "Bad Request",
+    },
+)
 @api_view(["POST"])
 def post_book_production_service_image(request, pk):
     """
@@ -118,6 +160,13 @@ def post_book_production_service_image(request, pk):
     return Response(status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+    method="get",
+    responses={
+        status.HTTP_200_OK: BookProductionServiceSerializer(),
+        status.HTTP_404_NOT_FOUND: "Not Found",
+    },
+)
 @api_view(["GET"])
 def get_book_production_service(request, pk):
     """
@@ -130,6 +179,13 @@ def get_book_production_service(request, pk):
     return Response(serialized_service.data, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+    method="delete",
+    responses={
+        status.HTTP_200_OK: "OK",
+        status.HTTP_404_NOT_FOUND: "Not Found",
+    },
+)
 @api_view(["DELETE"])
 def delete_book_production_service(request, pk):
     """
@@ -162,6 +218,15 @@ def delete_book_production_service(request, pk):
     return Response(status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+    method="put",
+    request_body=BookProductionServiceSerializer,
+    responses={
+        status.HTTP_200_OK: BookProductionServiceSerializer(),
+        status.HTTP_400_BAD_REQUEST: "Bad Request",
+        status.HTTP_404_NOT_FOUND: "Not Found",
+    },
+)
 @api_view(["PUT"])
 def put_book_production_service(request, pk):
     """
@@ -181,6 +246,13 @@ def put_book_production_service(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(
+    method="post",
+    responses={
+        status.HTTP_200_OK: "OK",
+        status.HTTP_404_NOT_FOUND: "Not Found",
+    },
+)
 @api_view(["POST"])
 def post_service_to_project(request, pk):
     """
@@ -221,6 +293,12 @@ def add_service_to_project_request(project_id: int, service_id: int):
 # BookPublishingProject
 
 
+@swagger_auto_schema(
+    method="get",
+    responses={
+        status.HTTP_200_OK: BookPublishingProjectSerializer(many=True),
+    },
+)
 @api_view(["GET"])
 def get_book_publishing_projects(request):
     """
@@ -244,6 +322,13 @@ def get_book_publishing_projects(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+    method="get",
+    responses={
+        status.HTTP_200_OK: FullBookPublishingProjectSerializer(),
+        status.HTTP_404_NOT_FOUND: "Not Found",
+    },
+)
 @api_view(["GET"])
 def get_book_publishing_project(request, pk):
     """
@@ -258,6 +343,15 @@ def get_book_publishing_project(request, pk):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+    method="put",
+    request_body=PutBookPublishingProjectSerializer,
+    responses={
+        status.HTTP_200_OK: PutBookPublishingProjectSerializer(),
+        status.HTTP_400_BAD_REQUEST: "Bad Request",
+        status.HTTP_404_NOT_FOUND: "Not Found",
+    },
+)
 @api_view(["PUT"])
 def put_book_publishing_project(request, pk):
     """
@@ -279,6 +373,14 @@ def put_book_publishing_project(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(
+    method="put",
+    responses={
+        status.HTTP_200_OK: BookPublishingProjectSerializer(),
+        status.HTTP_400_BAD_REQUEST: "Bad Request",
+        status.HTTP_404_NOT_FOUND: "Not Found",
+    },
+)
 @api_view(["PUT"])
 def form_book_publishing_project(request, pk):
     """
@@ -306,6 +408,13 @@ def form_book_publishing_project(request, pk):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+    method="put",
+    responses={
+        status.HTTP_200_OK: ResolveBookPublishingProjectSerializer(),
+        status.HTTP_404_NOT_FOUND: "Not Found",
+    },
+)
 @api_view(["PUT"])
 def resolve_book_publishing_project(request, pk):
     """
@@ -344,6 +453,13 @@ def caculate_personal_discount(circulation):
     return 0
 
 
+@swagger_auto_schema(
+    method="delete",
+    responses={
+        status.HTTP_200_OK: "OK",
+        status.HTTP_404_NOT_FOUND: "Not Found",
+    },
+)
 @api_view(["DELETE"])
 def delete_book_publishing_project(request, pk):
     """
@@ -363,6 +479,15 @@ def delete_book_publishing_project(request, pk):
 # SelectedServices
 
 
+@swagger_auto_schema(
+    method="put",
+    request_body=SelectedServicesSerializer,
+    responses={
+        status.HTTP_200_OK: SelectedServicesSerializer(),
+        status.HTTP_400_BAD_REQUEST: "Bad Request",
+        status.HTTP_404_NOT_FOUND: "Not Found",
+    },
+)
 @api_view(["PUT"])
 def put_selected_service(request, project_pk, service_pk):
     """
@@ -383,6 +508,13 @@ def put_selected_service(request, project_pk, service_pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(
+    method="delete",
+    responses={
+        status.HTTP_200_OK: "OK",
+        status.HTTP_404_NOT_FOUND: "Not Found",
+    },
+)
 @api_view(["DELETE"])
 def delete_selected_service(request, project_pk, service_pk):
     """
@@ -400,6 +532,14 @@ def delete_selected_service(request, project_pk, service_pk):
 # User
 
 
+@swagger_auto_schema(
+    method="post",
+    request_body=UserSerializer,
+    responses={
+        status.HTTP_200_OK: "OK",
+        status.HTTP_400_BAD_REQUEST: "Bad Request",
+    },
+)
 @api_view(["POST"])
 def sign_up_user(request):
     """
@@ -412,6 +552,13 @@ def sign_up_user(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(
+    method="post",
+    responses={
+        status.HTTP_200_OK: "OK",
+        status.HTTP_400_BAD_REQUEST: "Bad Request",
+    },
+)
 @api_view(["POST"])
 def log_in_user(request):
     """
@@ -428,6 +575,12 @@ def log_in_user(request):
     )
 
 
+@swagger_auto_schema(
+    method="post",
+    responses={
+        status.HTTP_204_NO_CONTENT: "No content",
+    },
+)
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -439,6 +592,14 @@ def log_out_user(request):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@swagger_auto_schema(
+    method="put",
+    request_body=UserSerializer,
+    responses={
+        status.HTTP_200_OK: UserSerializer(),
+        status.HTTP_400_BAD_REQUEST: "Bad Request",
+    },
+)
 @api_view(["PUT"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
