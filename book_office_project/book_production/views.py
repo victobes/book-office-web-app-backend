@@ -340,7 +340,7 @@ def get_book_publishing_projects(request):
         filters &= Q(formation_datetime__lte=parse(formation_datetime_end_filter))
 
     if not request.user.is_staff:
-        filters &= Q(client=request.user)
+        filters &= Q(customer=request.user)
 
     projects = BookPublishingProject.objects.filter(filters)
     serializer = BookPublishingProjectSerializer(projects, many=True)
@@ -656,7 +656,7 @@ def log_in_user(request):
     if user is not None:
         session_id = str(uuid.uuid4())
         session_storage.set(session_id, username)
-        response = Response(status=status.HTTP_201_CREATED)
+        response = Response(status=status.HTTP_200_OK)
         response.set_cookie("session_id", session_id, samesite="lax")
         return response
     return Response(
