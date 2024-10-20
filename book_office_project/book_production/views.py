@@ -515,7 +515,8 @@ def delete_book_publishing_project(request, pk):
     if not request.user.is_staff and project.customer != request.user:
         return Response(status=status.HTTP_403_FORBIDDEN)
 
-    project.status = BookPublishingProject.RequestStatus.DELETED
+    project.status = BookPublishingProject.ProjectStatus.DELETED
+    project.formation_datetime = datetime.now()
     project.save()
     return Response(status=status.HTTP_200_OK)
 
