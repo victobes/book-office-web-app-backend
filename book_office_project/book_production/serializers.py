@@ -41,10 +41,14 @@ class BookProductionServiceSerializer(serializers.ModelSerializer):
 # BookPublishingProject
 class BookPublishingProjectSerializer(serializers.ModelSerializer):
     customer = serializers.SerializerMethodField()
-
+    manager = serializers.SerializerMethodField()
+    
     def get_customer(self, obj):
         return obj.customer.username
 
+    def get_manager(self, obj):
+        return obj.manager.username if obj.manager else None
+    
     class Meta:
         model = BookPublishingProject
         fields = [

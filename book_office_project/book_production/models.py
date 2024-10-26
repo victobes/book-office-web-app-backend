@@ -6,7 +6,7 @@ class BookProductionService(models.Model):
     title = models.CharField(max_length=130, unique=True, blank=False, null=False)
     description = models.TextField()
     is_active = models.BooleanField(default=True)
-    image_url = models.CharField(max_length=255, null=False, default="")
+    image_url = models.CharField(max_length=255, null=True, blank="True", default="")
     price = models.CharField(max_length=50)
 
     def __str__(self):

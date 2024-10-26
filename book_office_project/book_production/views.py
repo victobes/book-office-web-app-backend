@@ -331,7 +331,7 @@ def get_book_publishing_projects(request):
     formation_datetime_start_filter = request.query_params.get("formation_start")
     formation_datetime_end_filter = request.query_params.get("formation_end")
 
-    filters = ~Q(status=BookPublishingProject.ProjectStatus.DELETED)
+    filters = ~Q(status=BookPublishingProject.ProjectStatus.DELETED) & ~Q(status=BookPublishingProject.ProjectStatus.DRAFT)
     if status_filter is not None:
         filters &= Q(status=status_filter.upper())
     if formation_datetime_start_filter is not None:
