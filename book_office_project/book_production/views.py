@@ -3,6 +3,7 @@ import uuid
 
 from datetime import datetime
 from dateutil.parser import parse
+from django.db import IntegrityError
 from django.db.models import Q
 from rest_framework.decorators import (
     api_view,
@@ -43,17 +44,7 @@ from book_production.utils import *
         ),
     ],
     responses={
-        status.HTTP_200_OK: openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "book_production_services": openapi.Schema(
-                    type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(type=openapi.TYPE_OBJECT),
-                ),
-                "book_publishing_project_id": openapi.Schema(type=openapi.TYPE_NUMBER),
-                "selected_services_count": openapi.Schema(type=openapi.TYPE_NUMBER),
-            },
-        ),
+        status.HTTP_200_OK: GetBookProductionServiceSerializer,
         status.HTTP_403_FORBIDDEN: "Forbidden",
     },
 )
@@ -70,8 +61,6 @@ def get_book_production_services_list(request):
         title__istartswith=service_name, is_active=True
     )
 
-    serializer = BookProductionServiceSerializer(services_list, many=True)
-
     project = None
     selected_services_count = 0
 
@@ -85,12 +74,17 @@ def get_book_production_services_list(request):
                 project_id=project.id
             ).count()
 
-    return Response(
+    serializer = GetBookProductionServiceSerializer(
         {
-            "book_production_services": serializer.data,
+            "book_production_services": BookProductionServiceSerializer(
+                services_list, many=True
+            ).data,
             "book_publishing_project_id": project.id if project else None,
             "selected_services_count": selected_services_count,
-        },
+        }
+    )
+    return Response(
+        serializer.data,
         status=status.HTTP_200_OK,
     )
 
@@ -121,15 +115,24 @@ def post_book_production_service(request):
 
 @swagger_auto_schema(
     method="post",
-    manual_parameters=[
-        openapi.Parameter(
-            name="image",
-            in_=openapi.IN_QUERY,
-            type=openapi.TYPE_FILE,
-            required=True,
-            description="Image",
-        )
-    ],
+    # manual_parameters=[
+    #     openapi.Parameter(
+    #         name="image",
+    #         in_=openapi.IN_QUERY,
+    #         type=openapi.TYPE_FILE,
+    #         required=True,
+    #         description="Image",
+    #     )
+    # ],
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "image": openapi.Schema(
+                type=openapi.TYPE_FILE, description="Изображение для загрузки"
+            )
+        },
+        required=["image"],
+    ),
     responses={
         status.HTTP_200_OK: "OK",
         status.HTTP_400_BAD_REQUEST: "Bad Request",
@@ -269,6 +272,7 @@ def put_book_production_service(request, pk):
     method="post",
     responses={
         status.HTTP_200_OK: "OK",
+        status.HTTP_400_BAD_REQUEST: "Bad Request",
         status.HTTP_403_FORBIDDEN: "Forbidden",
         status.HTTP_404_NOT_FOUND: "Not Found",
     },
@@ -284,7 +288,10 @@ def post_service_to_project(request, pk):
     if service is None:
         return Response("Service not found", status=status.HTTP_404_NOT_FOUND)
     project_id = get_or_create_customer_project(request.user.id)
-    add_service_to_project_request(project_id, pk)
+    try:
+        add_service_to_project_request(project_id, pk)
+    except IntegrityError:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_200_OK)
 
 
@@ -331,7 +338,9 @@ def get_book_publishing_projects(request):
     formation_datetime_start_filter = request.query_params.get("formation_start")
     formation_datetime_end_filter = request.query_params.get("formation_end")
 
-    filters = ~Q(status=BookPublishingProject.ProjectStatus.DELETED) & ~Q(status=BookPublishingProject.ProjectStatus.DRAFT)
+    filters = ~Q(status=BookPublishingProject.ProjectStatus.DELETED) & ~Q(
+        status=BookPublishingProject.ProjectStatus.DRAFT
+    )
     if status_filter is not None:
         filters &= Q(status=status_filter.upper())
     if formation_datetime_start_filter is not None:
@@ -342,7 +351,12 @@ def get_book_publishing_projects(request):
     if not request.user.is_staff:
         filters &= Q(customer=request.user)
 
-    projects = BookPublishingProject.objects.filter(filters)
+    # projects = BookPublishingProject.objects.filter(filters)
+    projects = (
+        BookPublishingProject.objects.filter(filters)
+        .select_related("customer")
+        .order_by("-pk")
+    )
     serializer = BookPublishingProjectSerializer(projects, many=True)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -364,6 +378,7 @@ def get_book_publishing_project(request, pk):
     Получение издательского проекта
     """
     filters = Q(id=pk) & ~Q(status=BookPublishingProject.ProjectStatus.DELETED)
+
     project = BookPublishingProject.objects.filter(filters).first()
     if project is None:
         return Response("Project not found", status=status.HTTP_404_NOT_FOUND)
@@ -454,6 +469,7 @@ def form_book_publishing_project(request, pk):
 
 @swagger_auto_schema(
     method="put",
+    request_body=ResolveBookPublishingProjectSerializer,
     responses={
         status.HTTP_200_OK: ResolveBookPublishingProjectSerializer(),
         status.HTTP_403_FORBIDDEN: "Forbidden",
@@ -483,7 +499,7 @@ def resolve_book_publishing_project(request, pk):
 
     project = BookPublishingProject.objects.get(id=pk)
     project.completion_datetime = datetime.now()
-    project.personal_discount = caculate_personal_discount(project.circulation)
+    project.personal_discount = calculate_personal_discount(project.circulation)
     project.manager = request.user
     project.save()
 
@@ -526,7 +542,7 @@ def delete_book_publishing_project(request, pk):
 
 @swagger_auto_schema(
     method="put",
-    request_body=SelectedServicesSerializer,
+    request_body=UpdateSelectedServiceSerializer,
     responses={
         status.HTTP_200_OK: SelectedServicesSerializer(),
         status.HTTP_400_BAD_REQUEST: "Bad Request",
@@ -640,7 +656,7 @@ def sign_up_user(request):
         ),
     ],
     responses={
-        status.HTTP_200_OK: "OK",
+        status.HTTP_200_OK: UserLoginSerializer(),
         status.HTTP_400_BAD_REQUEST: "Bad Request",
     },
 )
@@ -657,7 +673,8 @@ def log_in_user(request):
     if user is not None:
         session_id = str(uuid.uuid4())
         session_storage.set(session_id, username)
-        response = Response(status=status.HTTP_200_OK)
+        serializer = UserLoginSerializer(user)
+        response = Response(serializer.data, status=status.HTTP_200_OK)
         response.set_cookie("session_id", session_id, samesite="lax")
         return response
     return Response(
@@ -687,7 +704,7 @@ def log_out_user(request):
 
 @swagger_auto_schema(
     method="put",
-    request_body=UserSerializer,
+    request_body=UserUpdateSerializer,
     responses={
         status.HTTP_200_OK: UserSerializer(),
         status.HTTP_400_BAD_REQUEST: "Bad Request",

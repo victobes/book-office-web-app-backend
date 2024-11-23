@@ -1,7 +1,7 @@
 from book_production.serializers import *
 
 
-def caculate_personal_discount(circulation):
+def calculate_personal_discount(circulation):
     """Расчет персональной скидки"""
     if circulation > 100000:
         return 20
