@@ -4,8 +4,7 @@ Cистема учета услуг по допечатной подготовк
 ---
 ### Смежные репозитории:
 + Фронтенд (React + Vite): <https://github.com/victobes/book-office-web-app-frontend>
-+ Нативное приложение (Tauri):  *в разработке* 
++ Github Pages: <https://victobes.github.io/book-office-web-app-frontend/>
  
 ---
-### Демо-версия проекта:
-*в разработке*
+
